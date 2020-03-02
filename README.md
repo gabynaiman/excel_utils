@@ -4,7 +4,6 @@
 [![Build Status](https://travis-ci.org/gabynaiman/excel_utils.svg?branch=master)](https://travis-ci.org/gabynaiman/excel_utils)
 [![Coverage Status](https://coveralls.io/repos/github/gabynaiman/excel_utils/badge.svg?branch=master)](https://coveralls.io/github/gabynaiman/excel_utils?branch=master)
 [![Code Climate](https://codeclimate.com/github/gabynaiman/excel_utils.svg)](https://codeclimate.com/github/gabynaiman/excel_utils)
-[![Dependency Status](https://gemnasium.com/gabynaiman/excel_utils.svg)](https://gemnasium.com/gabynaiman/excel_utils)
 
 Excel utils for easy read and write
 
