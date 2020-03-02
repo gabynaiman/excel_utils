@@ -1,5 +1,6 @@
 require 'coverage_helper'
-require 'excel_utils'
 require 'minitest/autorun'
 require 'minitest/colorin'
 require 'pry-nav'
+
+require 'excel_utils'

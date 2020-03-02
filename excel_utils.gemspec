@@ -18,7 +18,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'rake', '~> 11.0'
+  spec.add_runtime_dependency 'inflecto', '~> 0.0'
+  spec.add_runtime_dependency 'roo', '~> 2.7'
+  spec.add_runtime_dependency 'roo-xls', '~> 1.1'
+  spec.add_runtime_dependency 'write_xlsx', '~> 0.85'
+
+  spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'minitest', '~> 5.0', '< 5.11'
   spec.add_development_dependency 'minitest-colorin', '~> 0.1'
   spec.add_development_dependency 'minitest-line', '~> 0.6'
