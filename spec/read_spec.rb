@@ -3,7 +3,7 @@ require 'minitest_helper'
 describe ExcelUtils, 'Read' do
 
   def expected_rows(sheet)
-    rows_by_sheet[sheet.name].map { |r| columns_by_sheet[sheet.name].zip(r).to_h }
+    rows_by_sheet[sheet.name].map { |r| Hash[columns_by_sheet[sheet.name].zip(r)] }
   end
 
   let :rows_by_sheet do
