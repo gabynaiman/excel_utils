@@ -3,10 +3,10 @@ module ExcelUtils
 
     attr_reader :filename, :normalize_column_names
     
-    def initialize(filename, normalize_column_names: false)
+    def initialize(filename, normalize_column_names: false, extension: nil)
       @filename = filename
       @normalize_column_names = normalize_column_names
-      @spreadsheet = Roo::Spreadsheet.open filename
+      @spreadsheet = Roo::Spreadsheet.open filename, extension: extension
     end
 
     def sheets

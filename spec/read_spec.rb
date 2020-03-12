@@ -102,4 +102,10 @@ describe ExcelUtils, 'Read' do
 
   end
 
+  it 'Force extension' do
+    filename = File.expand_path "../sample.tmp", __FILE__
+    workbook = ExcelUtils.read filename, extension: 'xlsx'
+    workbook.sheets.count.must_equal 3
+  end
+
 end
