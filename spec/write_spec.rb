@@ -17,8 +17,8 @@ describe ExcelUtils do
 
     data = {
       'Sheet 1' => [
-        {'column_a' => 1.5, 'column_b' => 'text 1', 'column_c' => DateTime.parse('2019-05-25T16:30:00')},
-        {'column_b' => 'text 2', 'column_c' => Date.parse('2019-07-09'), 'column_a' => 2},
+        {'column_a' => 1.5, 'column_b' => 'text 1', 'column_c' => DateTime.parse('2019-05-25T16:30:00'), 'column_d' => '999'},
+        {'column_b' => 'text 2', 'column_c' => Date.parse('2019-07-09'), 'column_a' => 2, 'column_d' => '0123'},
       ],
       'Sheet 2' => [
         {'Column A' => long_url, 'Column B' => long_text}

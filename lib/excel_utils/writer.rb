@@ -38,14 +38,19 @@ module ExcelUtils
           sheet.write_row 0, 0, header.map(&:to_s)
 
           sheet_data.each_with_index do |row, r|
-            header.each_with_index do |column, c|
+            row_index = r + 1
+            header.each_with_index do |column, col_index|
               if row[column]
-                if row[column].respond_to? :to_time
+                if row[column].is_a? String
+                  sheet.write_string row_index, col_index, row[column]
+                
+                elsif row[column].respond_to? :to_time
                   time = row[column].to_time
                   type = date?(time) ? :date : :date_time
-                  sheet.write_date_time r + 1, c, time.to_time.strftime(TIME_FORMAT), formats[type]
+                  sheet.write_date_time row_index, col_index, time.to_time.strftime(TIME_FORMAT), formats[type]
+                
                 else
-                  sheet.write r + 1, c, row[column]
+                  sheet.write row_index, col_index, row[column]
                 end
               end
             end
