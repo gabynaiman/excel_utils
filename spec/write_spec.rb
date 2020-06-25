@@ -17,7 +17,7 @@ describe ExcelUtils do
 
     data = {
       'Sheet 1' => [
-        {'column_a' => 1.5, 'column_b' => 'text 1', 'column_c' => DateTime.parse('2019-05-25T16:30:00'), 'column_d' => '999'},
+        {'column_a' => 1.5, 'column_b' => 'text 1', 'column_c' => DateTime.parse('2019-05-25T16:30:00')},
         {'column_b' => 'text 2', 'column_c' => Date.parse('2019-07-09'), 'column_a' => 2, 'column_d' => '0123'},
       ],
       'Sheet 2' => [
@@ -30,7 +30,14 @@ describe ExcelUtils do
 
     workbook = ExcelUtils.read filename
 
-    workbook.to_h.must_equal data
+    workbook.sheets.each do |sheet|
+      sheet.each_with_index do |row, i|
+        columns = row.keys | data[sheet.name][i].keys
+        columns.each do |column|
+          row[column].must_equal data[sheet.name][i][column] 
+        end
+      end
+    end
   end
 
 end

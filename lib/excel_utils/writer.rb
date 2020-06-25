@@ -34,7 +34,7 @@ module ExcelUtils
         sheet = workbook.add_worksheet sheet_name
 
         if sheet_data.any?
-          header = sheet_data.first.keys
+          header = sheet_data.flat_map(&:keys).uniq
           sheet.write_row 0, 0, header.map(&:to_s)
 
           sheet_data.each_with_index do |row, r|

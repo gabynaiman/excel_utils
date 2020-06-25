@@ -15,7 +15,7 @@ module ExcelUtils
       @column_names ||= begin
         if sheet.first_row
           first_row = sheet.row sheet.first_row
-          normalize_column_names ? first_row.map { |n| Inflecto.underscore(n.strip.gsub(' ', '_')).to_sym } : first_row
+          normalize_column_names ? first_row.map { |name| normalize_column name } : first_row
         else
           []
         end
@@ -44,6 +44,10 @@ module ExcelUtils
           []
         end
       end
+    end
+
+    def normalize_column(name)
+      Inflecto.underscore(name.strip.gsub(' ', '_')).to_sym
     end
 
   end
