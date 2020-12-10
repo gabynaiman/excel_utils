@@ -1,5 +1,7 @@
 module WorksheetIterators
-  class BatchIterator < Base
+  class BatchIterator
+
+    include Normalizer
 
     def initialize(sheet, normalize_column_names)
       @sheet = sheet
@@ -10,7 +12,20 @@ module WorksheetIterators
       rows.each(&block)
     end
 
+    def column_names
+      @column_names ||= begin
+        if sheet.first_row
+          first_row = sheet.row sheet.first_row
+          normalize_column_names ? normalize_columns(first_row) : first_row
+        else
+          []
+        end
+      end
+    end
+
     private
+
+    attr_reader :sheet, :normalize_column_names
 
     def rows
       @rows ||= begin

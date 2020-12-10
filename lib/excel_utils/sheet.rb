@@ -9,6 +9,7 @@ module ExcelUtils
       @name = name
       @spreadsheet = spreadsheet
       @normalize_column_names = normalize_column_names
+      @iterator_strategy = iterator_strategy
     end
 
     def column_names

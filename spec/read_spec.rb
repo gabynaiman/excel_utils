@@ -108,4 +108,37 @@ describe ExcelUtils, 'Read' do
     workbook.sheets.count.must_equal 3
   end
 
+  describe 'Worksheet Iterators' do
+
+    let(:filename) { File.expand_path "../large.xlsx", __FILE__ }
+
+    def print_memory(prefix)
+      pid, memory_usage = `ps ax -o pid,rss | grep -E "^[[:space:]]*#{$$}"`.strip.split.map(&:to_i)
+      puts "[#{prefix}] MEMORY USAGE: #{memory_usage} kilobytes"
+    end
+
+    it 'Batch Iterator' do
+      print_memory 'batch-BEFORE'
+      workbook = ExcelUtils.read filename, iterator_strategy: 'batch'
+      count = 0
+      workbook['Sheet1'].each do |row|
+        count += 1
+      end
+      print_memory 'batch-AFTER'
+      count.must_equal 20000
+    end
+
+    it 'Stream Iterator' do
+      print_memory 'stream-BEFORE'
+      workbook = ExcelUtils.read filename, iterator_strategy: 'stream'
+      count = 0
+      workbook['Sheet1'].each do |row|
+        count += 1
+      end
+      print_memory 'stream-AFTER'
+      count.must_equal 20000
+    end
+
+  end
+
 end

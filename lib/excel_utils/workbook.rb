@@ -1,7 +1,7 @@
 module ExcelUtils
   class Workbook
 
-    attr_reader :filename, :normalize_column_names
+    attr_reader :filename, :normalize_column_names, :iterator_strategy
 
     def initialize(filename, normalize_column_names: false, extension: nil, iterator_strategy: nil)
       @filename = filename
@@ -11,7 +11,7 @@ module ExcelUtils
     end
 
     def sheets
-      @sheets ||= spreadsheet.sheets.map do |name| 
+      @sheets ||= spreadsheet.sheets.map do |name|
         Sheet.new name, spreadsheet, normalize_column_names: normalize_column_names,
                                      iterator_strategy: iterator_strategy
 
@@ -30,7 +30,7 @@ module ExcelUtils
 
     private
 
-    attr_reader :spreadsheet, :iterator_strategy
+    attr_reader :spreadsheet
 
   end
 end
