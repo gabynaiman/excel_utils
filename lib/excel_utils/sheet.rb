@@ -2,10 +2,10 @@ module ExcelUtils
   class Sheet
 
     include Enumerable
-    
+
     attr_reader :name, :normalize_column_names
-    
-    def initialize(name, spreadsheet, normalize_column_names: false)
+
+    def initialize(name, spreadsheet, normalize_column_names: false, iterator_strategy: 'batch')
       @name = name
       @spreadsheet = spreadsheet
       @normalize_column_names = normalize_column_names
@@ -13,41 +13,31 @@ module ExcelUtils
 
     def column_names
       @column_names ||= begin
-        if sheet.first_row
-          first_row = sheet.row sheet.first_row
-          normalize_column_names ? first_row.map { |name| normalize_column name } : first_row
-        else
-          []
-        end
+        iterator.column_names
       end
     end
 
     def each(&block)
-      rows.each(&block)
+      iterator.each(&block)
     end
 
     private
 
-    attr_reader :spreadsheet
+    attr_reader :spreadsheet, :iterator_strategy
 
     def sheet
       spreadsheet.sheet name
     end
 
-    def rows
-      @rows ||= begin
-        if sheet.first_row
-          sheet.to_a[1..-1].map do |row| 
-            Hash[column_names.zip(row)] 
-          end
+    def iterator
+      @iterator ||= begin
+        if iterator_strategy == 'stream'
+          raise 'Invalid extension. Cannot use stream strategy with this file' unless sheet.respond_to? :each_row_streaming
+          WorksheetIterators::StreamIterator.new sheet, @normalize_column_names
         else
-          []
+          WorksheetIterators::BatchIterator.new sheet, @normalize_column_names
         end
       end
-    end
-
-    def normalize_column(name)
-      Inflecto.underscore(name.strip.gsub(' ', '_')).to_sym
     end
 
   end

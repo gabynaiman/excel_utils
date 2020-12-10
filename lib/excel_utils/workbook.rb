@@ -2,16 +2,19 @@ module ExcelUtils
   class Workbook
 
     attr_reader :filename, :normalize_column_names
-    
-    def initialize(filename, normalize_column_names: false, extension: nil)
+
+    def initialize(filename, normalize_column_names: false, extension: nil, iterator_strategy: nil)
       @filename = filename
       @normalize_column_names = normalize_column_names
+      @iterator_strategy = iterator_strategy
       @spreadsheet = Roo::Spreadsheet.open filename, extension: extension
     end
 
     def sheets
       @sheets ||= spreadsheet.sheets.map do |name| 
-        Sheet.new name, spreadsheet, normalize_column_names: normalize_column_names
+        Sheet.new name, spreadsheet, normalize_column_names: normalize_column_names,
+                                     iterator_strategy: iterator_strategy
+
       end
     end
 
@@ -27,7 +30,7 @@ module ExcelUtils
 
     private
 
-    attr_reader :spreadsheet
+    attr_reader :spreadsheet, :iterator_strategy
 
   end
 end
