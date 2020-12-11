@@ -23,13 +23,12 @@ module ExcelUtils
           unique_sheet = Sheet.new 'default', iterator
           [unique_sheet]
         else
-          a = spreadsheet.sheets.map do |name|
+          spreadsheet.sheets.map do |name|
             sheet = spreadsheet.sheet name
             iterator = WorksheetIterators.iterator_for name, sheet, file_ext, normalize_column_names
 
             Sheet.new name, iterator
           end
-          a
         end
       end
     end
