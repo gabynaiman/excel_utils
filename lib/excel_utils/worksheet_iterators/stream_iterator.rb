@@ -4,7 +4,7 @@ module ExcelUtils
 
       include Normalizer
 
-      def initialize(sheet, normalize_column_names)
+      def initialize(name, sheet, normalize_column_names)
         @sheet = sheet
         @normalize_column_names = normalize_column_names
       end
@@ -12,7 +12,6 @@ module ExcelUtils
       def each(&block)
         sheet.each_row_streaming(pad_cells: true, offset: 1) do |row|
           cells = row.map { |cell| cell ? cell.value : cell }
-          #break if cells.all? { |cell| cell.to_s.strip.empty? }
           block.call column_names.zip(cells).to_h
         end
       end

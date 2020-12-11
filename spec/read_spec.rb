@@ -22,15 +22,15 @@ describe ExcelUtils, 'Read' do
     }
   end
 
-  [['xls', 'batch'], ['xlsx', 'batch'], ['xlsx', 'stream']].each do |extension, strategy|
+  ['xls', 'xlsx'].each do |extension|
 
-    describe "#{extension} #{strategy}" do
+    describe "#{extension}" do
   
       let(:filename) { File.expand_path "../sample.#{extension}", __FILE__ }
 
       describe 'Original column names' do
 
-        let(:workbook) { ExcelUtils.read filename, iterator_strategy: strategy }
+        let(:workbook) { ExcelUtils.read filename }
         
         let :columns_by_sheet do
           {
@@ -119,7 +119,7 @@ describe ExcelUtils, 'Read' do
 
     it 'Batch Iterator' do
       print_memory 'batch-BEFORE'
-      workbook = ExcelUtils.read filename, iterator_strategy: 'batch'
+      workbook = ExcelUtils.read filename
       count = 0
       workbook['Sheet1'].each do |row|
         count += 1
@@ -130,7 +130,7 @@ describe ExcelUtils, 'Read' do
 
     it 'Stream Iterator' do
       print_memory 'stream-BEFORE'
-      workbook = ExcelUtils.read filename, iterator_strategy: 'stream'
+      workbook = ExcelUtils.read filename
       count = 0
       workbook['Sheet1'].each do |row|
         count += 1

@@ -4,8 +4,9 @@ module ExcelUtils
 
       include Normalizer
 
-      def initialize(sheet, normalize_column_names)
-        @sheet = sheet
+      def initialize(name, spreadsheet, normalize_column_names)
+        @name = name
+        @spreadsheet = spreadsheet
         @normalize_column_names = normalize_column_names
       end
 
@@ -26,7 +27,11 @@ module ExcelUtils
 
       private
 
-      attr_reader :sheet, :normalize_column_names
+      attr_reader :spreadsheet, :name, :normalize_column_names
+
+      def sheet
+        spreadsheet.sheet name
+      end
 
       def rows
         @rows ||= begin
