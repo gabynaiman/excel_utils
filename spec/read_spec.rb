@@ -102,6 +102,57 @@ describe ExcelUtils, 'Read' do
 
   end
 
+  describe 'csv' do
+
+    let(:workbook) do
+      ExcelUtils.read File.expand_path("../sample.csv", __FILE__),
+                      normalize_column_names: normalize_column_names
+    end
+
+    let(:expected_data) do
+      data = [
+        ['1', 'some text'],
+        ['2', '1.35'],
+        ['3', '17/08/2019'],
+        ['4', nil],
+      ]
+      data.map { |r| Hash[expected_columns.zip(r)] }
+    end
+
+    describe 'Original column names' do
+
+      let(:expected_columns) { ['Column A', 'Column B'] }
+
+      let(:normalize_column_names) { false }
+
+      it 'Column names' do
+        workbook.sheets.first.column_names.must_equal expected_columns
+      end
+
+      it 'Rows' do
+        workbook.sheets.first.to_a.must_equal expected_data
+      end
+
+    end
+
+    describe 'Normalized column names' do
+
+      let(:expected_columns) { [:column_a, :column_b] }
+
+      let(:normalize_column_names) { true }
+
+      it 'Column names' do
+        workbook.sheets.first.column_names.must_equal expected_columns
+      end
+
+      it 'Rows' do
+        workbook.sheets.first.to_a.must_equal expected_data
+      end
+
+    end
+
+  end
+
   it 'Force extension' do
     filename = File.expand_path "../sample.tmp", __FILE__
     workbook = ExcelUtils.read filename, extension: 'xlsx'
@@ -110,13 +161,13 @@ describe ExcelUtils, 'Read' do
 
   describe 'Worksheet Iterators' do
 
-    ['xlsx', 'xlsx'].each do |extension|
+    ['csv', 'xls', 'xlsx'].each do |extension|
 
       it "Large #{extension} file" do
         filename = File.expand_path "../large.#{extension}", __FILE__
         workbook = ExcelUtils.read filename
         count = 0
-        workbook['Sheet1'].each do |row|
+        workbook.sheets.first.each do |row|
           count += 1
         end
         count.must_equal 20000
