@@ -13,9 +13,7 @@ module ExcelUtils
     end
 
     def column_names
-      @column_names ||= begin
-        iterator.column_names
-      end
+      @column_names ||= iterator.column_names
     end
 
     def each(&block)

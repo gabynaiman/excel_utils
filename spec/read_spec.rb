@@ -22,15 +22,15 @@ describe ExcelUtils, 'Read' do
     }
   end
 
-  ['xls', 'xlsx'].each do |extension|
+  [['xls', 'batch'], ['xlsx', 'batch'], ['xlsx', 'stream']].each do |extension, strategy|
 
-    describe extension do
+    describe "#{extension} #{strategy}" do
   
       let(:filename) { File.expand_path "../sample.#{extension}", __FILE__ }
 
       describe 'Original column names' do
 
-        let(:workbook) { ExcelUtils.read filename }
+        let(:workbook) { ExcelUtils.read filename, iterator_strategy: strategy }
         
         let :columns_by_sheet do
           {

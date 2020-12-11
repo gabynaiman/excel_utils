@@ -3,25 +3,27 @@ module WorksheetIterators
 
     include Normalizer
 
-    attr_reader :column_names
-
     def initialize(sheet, normalize_column_names)
       @sheet = sheet
       @normalize_column_names = normalize_column_names
-      @column_names = nil
     end
 
     def each(&block)
-      column_names = nil
-      sheet.each_row_streaming(pad_cells: true) do |row|
+      sheet.each_row_streaming(pad_cells: true, offset: 1) do |row|
         cells = row.map { |cell| cell ? cell.value : cell }
-        break if cells.all? { |cell| cell.to_s.strip.empty? }
+        #break if cells.all? { |cell| cell.to_s.strip.empty? }
+        block.call column_names.zip(cells).to_h
+      end
+    end
 
-        if column_names.nil?
-          column_names = normalize_column_names ? normalize_columns(cells) : cells
-        else
-          block.call column_names.zip(cells).to_h
+    def column_names
+      @column_names ||= begin
+        columns = []
+        sheet.each_row_streaming(pad_cells: true, max_rows: 0) do |row|
+          cells = row.map { |cell| cell ? cell.value : cell }
+          columns = normalize_column_names ? normalize_columns(cells) : cells
         end
+        columns
       end
     end
 
