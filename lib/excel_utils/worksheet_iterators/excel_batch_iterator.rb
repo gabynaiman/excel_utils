@@ -1,14 +1,6 @@
 module ExcelUtils
   module WorksheetIterators
-    class BatchIterator
-
-      include Normalizer
-
-      def initialize(name, spreadsheet, normalize_column_names)
-        @name = name
-        @spreadsheet = spreadsheet
-        @normalize_column_names = normalize_column_names
-      end
+    class ExcelBatchIterator < ExcelIterator
 
       def each(&block)
         rows.each(&block)
@@ -26,12 +18,6 @@ module ExcelUtils
       end
 
       private
-
-      attr_reader :spreadsheet, :name, :normalize_column_names
-
-      def sheet
-        spreadsheet.sheet name
-      end
 
       def rows
         @rows ||= begin

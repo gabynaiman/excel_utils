@@ -24,8 +24,7 @@ module ExcelUtils
           [unique_sheet]
         else
           spreadsheet.sheets.map do |name|
-            sheet = spreadsheet.sheet name
-            iterator = WorksheetIterators.iterator_for name, sheet, file_ext, normalize_column_names
+            iterator = WorksheetIterators.iterator_for name, spreadsheet, file_ext, normalize_column_names
 
             Sheet.new name, iterator
           end
