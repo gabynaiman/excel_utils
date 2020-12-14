@@ -24,7 +24,7 @@ describe ExcelUtils, 'Read' do
 
   ['xls', 'xlsx'].each do |extension|
 
-    describe "#{extension}" do
+    describe extension do
   
       let(:filename) { File.expand_path "../sample.#{extension}", __FILE__ }
 
