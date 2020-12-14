@@ -6,7 +6,7 @@ module ExcelUtils
 
       attr_reader :column_names
 
-      def initialize(name, reader, normalize_column_names)
+      def initialize(reader, normalize_column_names)
         @normalize_column_names = normalize_column_names
         @column_names = get_columns reader.gets
         @rows = reader.read.map { |r| Hash[column_names.zip(r)] }
