@@ -47,10 +47,14 @@ module ExcelUtils
       attr_reader :spreadsheet, :normalize_column_names
 
       def each_row
-        first = true
-        spreadsheet.each do |row|
-          yield row unless first
-          first = false
+        if !sheet.first_row.nil?
+          first = true
+          sheet.each do |row|
+            yield row unless first
+            first = false
+          end
+        else
+          []
         end
       end
 
