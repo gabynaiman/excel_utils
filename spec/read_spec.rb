@@ -133,6 +133,14 @@ describe ExcelUtils, 'Read' do
         workbook.sheets.first.to_a.must_equal expected_data
       end
 
+      it 'to_h' do
+        workbook.to_h.must_equal 'default' => expected_data
+      end
+
+      it '[]' do
+        workbook['default'].to_a.must_equal expected_data
+      end
+
     end
 
     describe 'Normalized column names' do
