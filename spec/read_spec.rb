@@ -102,10 +102,93 @@ describe ExcelUtils, 'Read' do
 
   end
 
+  describe 'csv' do
+
+    let(:workbook) do
+      ExcelUtils.read File.expand_path("../sample.csv", __FILE__),
+                      normalize_column_names: normalize_column_names
+    end
+
+    let(:expected_data) do
+      [
+        ['1', 'some text'],
+        ['2', '1.35'],
+        ['3', '17/08/2019'],
+        ['4', nil],
+      ].map { |r| Hash[expected_columns.zip(r)] }
+    end
+
+    describe 'Original column names' do
+
+      let(:expected_columns) { ['Column A', 'Column B'] }
+
+      let(:normalize_column_names) { false }
+
+      it 'Column names' do
+        workbook.sheets.first.column_names.must_equal expected_columns
+      end
+
+      it 'Rows' do
+        workbook.sheets.first.to_a.must_equal expected_data
+      end
+
+      it 'to_h' do
+        workbook.to_h.must_equal 'default' => expected_data
+      end
+
+      describe '[]' do
+
+        it 'default sheet' do
+          workbook['default'].to_a.must_equal expected_data
+        end
+
+        it 'missing sheet' do
+          workbook['missing'].must_be_nil
+        end
+
+      end
+
+    end
+
+    describe 'Normalized column names' do
+
+      let(:expected_columns) { [:column_a, :column_b] }
+
+      let(:normalize_column_names) { true }
+
+      it 'Column names' do
+        workbook.sheets.first.column_names.must_equal expected_columns
+      end
+
+      it 'Rows' do
+        workbook.sheets.first.to_a.must_equal expected_data
+      end
+
+    end
+
+  end
+
   it 'Force extension' do
     filename = File.expand_path "../sample.tmp", __FILE__
     workbook = ExcelUtils.read filename, extension: 'xlsx'
     workbook.sheets.count.must_equal 3
+  end
+
+  describe 'Worksheet Iterators' do
+
+    ['csv', 'xls', 'xlsx'].each do |extension|
+
+      it "Large #{extension} file" do
+        filename = File.expand_path "../large.#{extension}", __FILE__
+        workbook = ExcelUtils.read filename
+        count = 0
+        workbook.sheets.first.each do |row|
+          count += 1
+        end
+        count.must_equal 20000
+      end
+    end
+
   end
 
 end
