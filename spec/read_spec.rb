@@ -110,13 +110,12 @@ describe ExcelUtils, 'Read' do
     end
 
     let(:expected_data) do
-      data = [
+      [
         ['1', 'some text'],
         ['2', '1.35'],
         ['3', '17/08/2019'],
         ['4', nil],
-      ]
-      data.map { |r| Hash[expected_columns.zip(r)] }
+      ].map { |r| Hash[expected_columns.zip(r)] }
     end
 
     describe 'Original column names' do
@@ -137,8 +136,16 @@ describe ExcelUtils, 'Read' do
         workbook.to_h.must_equal 'default' => expected_data
       end
 
-      it '[]' do
-        workbook['default'].to_a.must_equal expected_data
+      describe '[]' do
+
+        it 'default sheet' do
+          workbook['default'].to_a.must_equal expected_data
+        end
+
+        it 'missing sheet' do
+          workbook['missing'].must_be_nil
+        end
+
       end
 
     end

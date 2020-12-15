@@ -1,6 +1,5 @@
 module ExcelUtils
   module Workbooks
-
     class CSV
 
       DEFAULT_SHEET_NAME = 'default'.freeze

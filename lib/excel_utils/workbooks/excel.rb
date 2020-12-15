@@ -1,6 +1,5 @@
 module ExcelUtils
   module Workbooks
-
     class Excel
 
       attr_reader :filename, :normalize_column_names
