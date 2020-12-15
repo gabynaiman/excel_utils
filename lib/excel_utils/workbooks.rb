@@ -41,8 +41,10 @@ module ExcelUtils
 
     class CSV
 
+      DEFAULT_SHEET_NAME = 'default'.freeze
+
       def initialize(filename, normalize_column_names: false)
-        @iterator = Sheets::CSV.new filename, normalize_column_names
+        @iterator = Sheets::CSV.new filename, DEFAULT_SHEET_NAME, normalize_column_names
       end
 
       def sheets
@@ -50,11 +52,11 @@ module ExcelUtils
       end
 
       def [](sheet_name)
-        @iterator
+        sheet_name == DEFAULT_SHEET_NAME ? @iterator : nil
       end
 
       def to_h
-        {'default' => @iterator.to_a}
+        {DEFAULT_SHEET_NAME => @iterator.to_a}
       end
 
     end

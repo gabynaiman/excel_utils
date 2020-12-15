@@ -7,9 +7,25 @@ module ExcelUtils
 
       attr_reader :name
 
-      def each(&block)
-        raise 'Not implemented'
+      def initialize(name, normalize_column_names)
+        @name = name
+        @normalize_column_names = normalize_column_names
       end
+
+      def each(&block)
+        each_row do |row|
+          block.call column_names.zip(row).to_h
+        end
+      end
+
+      def column_names
+        @column_names ||= begin
+          columns = get_column_names
+          @normalize_column_names ? normalize_columns(columns) : columns
+        end
+      end
+
+      private
 
       def normalize_columns(names)
         names.map do |name|
@@ -22,89 +38,79 @@ module ExcelUtils
     class Excel < Base
 
       def initialize(name, spreadsheet, normalize_column_names)
-        @name = name
+        super name, normalize_column_names
         @spreadsheet = spreadsheet
-        @normalize_column_names = normalize_column_names
-      end
-
-      def each(&block)
-        rows.each(&block)
-      end
-
-      def column_names
-        @column_names ||= begin
-          if sheet.first_row
-            first_row = sheet.row sheet.first_row
-            normalize_column_names ? normalize_columns(first_row) : first_row
-          else
-            []
-          end
-        end
       end
 
       private
 
       attr_reader :spreadsheet, :normalize_column_names
 
-      def sheet
-        spreadsheet.sheet name
+      def each_row
+        first = true
+        spreadsheet.each do |row|
+          yield row unless first
+          first = false
+        end
       end
 
-      def rows
-        @rows ||= begin
-          if sheet.first_row
-            sheet.to_a[1..-1].map do |row|
-              Hash[column_names.zip(row)]
-            end
-          else
-            []
-          end
+      def get_column_names
+        if sheet.first_row
+          sheet.row sheet.first_row
+        else
+          []
         end
+      end
+
+      def sheet
+        spreadsheet.sheet name
       end
 
     end
 
     class ExcelStream < Excel
 
-      def each(&block)
+      def each_row
         sheet.each_row_streaming(pad_cells: true, offset: 1) do |row|
           cells = row.map { |cell| cell ? cell.value : cell }
-          block.call column_names.zip(cells).to_h
+          yield cells
         end
       end
 
-      def column_names
-        @column_names ||= begin
-          columns = []
-          sheet.each_row_streaming(pad_cells: true, max_rows: 0) do |row|
-            cells = row.map { |cell| cell ? cell.value : cell }
-            columns = normalize_column_names ? normalize_columns(cells) : cells
-          end
-          columns
+      def get_column_names
+        columns = []
+        sheet.each_row_streaming(pad_cells: true, max_rows: 0) do |row|
+          cells = row.map { |cell| cell ? cell.value : cell }
+          columns = cells
         end
+        columns
       end
     end
 
     class CSV < Base
 
-      attr_reader :column_names
-
-      def initialize(filename, normalize_column_names)
-        reader = NesquikCSV.open filename
-        @normalize_column_names = normalize_column_names
-        @column_names = get_columns reader.gets
-        @rows = reader.read.map { |r| Hash[column_names.zip(r)] }
-        reader.close
-      end
-
-      def each(&block)
-        @rows.each(&block)
+      def initialize(filename, name, normalize_column_names)
+        super name, normalize_column_names
+        @filename = filename
       end
 
       private
 
-      def get_columns(columns)
-        @normalize_column_names ? normalize_columns(columns) : columns
+      def each_row
+        first = true
+        NesquikCSV.foreach(@filename) do |row|
+          yield row unless first
+          first = false
+        end
+      end
+
+      def get_column_names
+        columns = []
+        NesquikCSV.foreach(@filename) do |header|
+          columns = header
+          break
+        end
+        columns
       end
     end
 
