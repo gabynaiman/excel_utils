@@ -12,7 +12,7 @@ module ExcelUtils
       attr_reader :spreadsheet, :normalize_column_names
 
       def each_row
-        if !sheet.first_row.nil?
+        if sheet.first_row
           first = true
           sheet.each do |row|
             yield row unless first

@@ -7,12 +7,12 @@ require 'inflecto'
 require 'nesquikcsv'
 
 require_relative 'excel_utils/version'
-require_relative 'excel_utils/workbooks/excel'
 require_relative 'excel_utils/workbooks/csv'
+require_relative 'excel_utils/workbooks/excel'
 require_relative 'excel_utils/sheets/base'
+require_relative 'excel_utils/sheets/csv'
 require_relative 'excel_utils/sheets/excel'
 require_relative 'excel_utils/sheets/excel_stream'
-require_relative 'excel_utils/sheets/csv'
 require_relative 'excel_utils/writer'
 
 module ExcelUtils
