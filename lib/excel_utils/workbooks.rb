@@ -1,5 +1,5 @@
 module ExcelUtils
-  class Workbooks
+  module Workbooks
 
     class Excel
 
