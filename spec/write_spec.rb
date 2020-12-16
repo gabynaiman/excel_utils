@@ -34,7 +34,7 @@ describe ExcelUtils do
       sheet.each_with_index do |row, i|
         columns = row.keys | data[sheet.name][i].keys
         columns.each do |column|
-          row[column].must_equal data[sheet.name][i][column] 
+          row[column].must_equal data[sheet.name][i][column]
         end
       end
     end

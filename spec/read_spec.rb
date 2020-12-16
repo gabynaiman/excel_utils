@@ -2,96 +2,81 @@ require 'minitest_helper'
 
 describe ExcelUtils, 'Read' do
 
-  def expected_rows(sheet)
-    rows_by_sheet[sheet.name].map { |r| Hash[columns_by_sheet[sheet.name].zip(r)] }
-  end
+  Dir.glob(File.join(RESOURCES_PATH, 'basic.*')).each do |filename|
 
-  let :rows_by_sheet do
-    {
-      'Sheet1' => [
-        [1.0, 'some text'],
-        [2.0, 1.35],
-        [3.0, Date.parse('2019-08-17')],
-        [4.0, nil]
-      ],
-      'Sheet2' => [
-        [123.0, 'Text 1'],
-        [456.0, 'Text 2']
-      ],
-      'Sheet3' => []
-    }
-  end
+    [true, false].each do |normalize_column_names|
 
-  ['xls', 'xlsx'].each do |extension|
+      describe File.basename(filename), "Workbook (normalize_column_names: #{normalize_column_names})" do
 
-    describe extension do
-  
-      let(:filename) { File.expand_path "../sample.#{extension}", __FILE__ }
+        let(:workbook) { ExcelUtils.read filename, normalize_column_names: normalize_column_names }
 
-      describe 'Original column names' do
+        let(:sheet) { workbook.sheets.first }
 
-        let(:workbook) { ExcelUtils.read filename }
-        
-        let :columns_by_sheet do
-          {
-            'Sheet1' => ['Column A', 'Column B'],
-            'Sheet2' => ['ID', 'Value'],
-            'Sheet3' => []
-          }
+        let(:csv?) { File.extname(filename) == '.csv' }
+
+        let(:expected_sheet_name) { csv? ? 'default' : 'Sheet1' }
+
+        let(:column_a) { normalize_column_names ? :column_a : 'Column A' }
+
+        let(:column_b) { normalize_column_names ? :column_b : 'Column B' }
+
+        let(:expected_columns) { [column_a, column_b] }
+
+        let :expected_rows do
+          if csv?
+            [
+              {column_a => '1', column_b => 'some text'},
+              {column_a => '2', column_b => '1,35'},
+              {column_a => '3', column_b => '17/08/2019'},
+              {column_a => '4', column_b => nil}
+            ]
+          else
+            [
+              {column_a => 1, column_b => 'some text'},
+              {column_a => 2, column_b => 1.35},
+              {column_a => 3, column_b => Date.parse('2019-08-17')},
+              {column_a => 4, column_b => nil}
+            ]
+          end
+        end
+
+        it 'filename' do
+          workbook.filename.must_equal filename
+        end
+
+        it 'normalize_column_names' do
+          workbook.normalize_column_names.must_equal normalize_column_names
+        end
+
+        it 'sheets' do
+          workbook.sheets.count.must_equal 1
+          workbook[workbook.sheets.first.name].must_equal sheet
         end
 
         it 'to_h' do
-          workbook.to_h.must_equal 'Sheet1' => expected_rows(workbook['Sheet1']),
-                                   'Sheet2' => expected_rows(workbook['Sheet2']),
-                                   'Sheet3' => []
+          workbook.to_h.must_equal workbook.sheets.first.name => sheet.to_a
         end
 
-        ['Sheet1', 'Sheet2', 'Sheet3'].each do |sheet_name|
+        describe 'Sheet' do
 
-          describe sheet_name do
-
-            let(:sheet) { workbook[sheet_name] }
-
-            it 'Column names' do
-              sheet.column_names.must_equal columns_by_sheet[sheet_name]
-            end
-
-            it 'Rows' do
-              sheet.to_a.must_equal expected_rows(sheet)
-            end
-
+          it 'name' do
+            sheet.name.must_equal expected_sheet_name
           end
 
-        end
+          it 'normalize_column_names' do
+            sheet.normalize_column_names.must_equal workbook.normalize_column_names
+          end
 
-      end
+          it 'column_names' do
+            sheet.column_names.must_equal expected_columns
+          end
 
-      describe 'Normalized column names' do
+          it 'count' do
+            sheet.count.must_equal 4
+          end
 
-        let(:workbook) { ExcelUtils.read filename, normalize_column_names: true }
-        
-        let :columns_by_sheet do
-          {
-            'Sheet1' => [:column_a, :column_b],
-            'Sheet2' => [:id, :value],
-            'Sheet3' => []
-          }
-        end
-
-        ['Sheet1', 'Sheet2', 'Sheet3'].each do |sheet_name|
-
-          describe sheet_name do
-
-            let(:sheet) { workbook[sheet_name] }
-
-            it 'Column names' do
-              sheet.column_names.must_equal columns_by_sheet[sheet_name]
-            end
-
-            it 'Rows' do
-              sheet.to_a.must_equal expected_rows(sheet)
-            end
-
+          it 'to_a' do
+            sheet.to_a.must_equal expected_rows
           end
 
         end
@@ -102,93 +87,66 @@ describe ExcelUtils, 'Read' do
 
   end
 
-  describe 'csv' do
+  it 'empty.csv' do
+    workbook = ExcelUtils.read resource_path('empty.csv')
 
-    let(:workbook) do
-      ExcelUtils.read File.expand_path("../sample.csv", __FILE__),
-                      normalize_column_names: normalize_column_names
-    end
+    workbook.sheets.map(&:name).must_equal ['default']
 
-    let(:expected_data) do
-      [
-        ['1', 'some text'],
-        ['2', '1.35'],
-        ['3', '17/08/2019'],
-        ['4', nil],
-      ].map { |r| Hash[expected_columns.zip(r)] }
-    end
+    workbook['default'].column_names.must_equal []
+    workbook['default'].to_a.must_equal []
 
-    describe 'Original column names' do
-
-      let(:expected_columns) { ['Column A', 'Column B'] }
-
-      let(:normalize_column_names) { false }
-
-      it 'Column names' do
-        workbook.sheets.first.column_names.must_equal expected_columns
-      end
-
-      it 'Rows' do
-        workbook.sheets.first.to_a.must_equal expected_data
-      end
-
-      it 'to_h' do
-        workbook.to_h.must_equal 'default' => expected_data
-      end
-
-      describe '[]' do
-
-        it 'default sheet' do
-          workbook['default'].to_a.must_equal expected_data
-        end
-
-        it 'missing sheet' do
-          workbook['missing'].must_be_nil
-        end
-
-      end
-
-    end
-
-    describe 'Normalized column names' do
-
-      let(:expected_columns) { [:column_a, :column_b] }
-
-      let(:normalize_column_names) { true }
-
-      it 'Column names' do
-        workbook.sheets.first.column_names.must_equal expected_columns
-      end
-
-      it 'Rows' do
-        workbook.sheets.first.to_a.must_equal expected_data
-      end
-
-    end
-
+    workbook.to_h.must_equal 'default' => []
   end
 
-  it 'Force extension' do
-    filename = File.expand_path "../sample.tmp", __FILE__
-    workbook = ExcelUtils.read filename, extension: 'xlsx'
-    workbook.sheets.count.must_equal 3
+  it 'only_headers.csv' do
+    workbook = ExcelUtils.read resource_path('only_headers.csv')
+
+    workbook.sheets.map(&:name).must_equal ['default']
+
+    workbook['default'].column_names.must_equal ['ID', 'Value']
+    workbook['default'].to_a.must_equal []
+
+    workbook.to_h.must_equal 'default' => []
   end
 
-  describe 'Worksheet Iterators' do
+  it 'custom_extension.tmp' do
+    workbook = ExcelUtils.read resource_path('custom_extension.tmp'), extension: 'xlsx'
 
-    ['csv', 'xls', 'xlsx'].each do |extension|
+    expected_rows = [
+      {'ID' => 1, 'Value' => 'Text 1'},
+      {'ID' => 2, 'Value' => 'Text 2'}
+    ]
 
-      it "Large #{extension} file" do
-        filename = File.expand_path "../large.#{extension}", __FILE__
-        workbook = ExcelUtils.read filename
-        count = 0
-        workbook.sheets.first.each do |row|
-          count += 1
-        end
-        count.must_equal 20000
-      end
-    end
+    workbook.sheets.map(&:name).must_equal ['Sheet1']
 
+    workbook['Sheet1'].column_names.must_equal ['ID', 'Value']
+    workbook['Sheet1'].to_a.must_equal expected_rows
+
+    workbook.to_h.must_equal 'Sheet1' => expected_rows
+  end
+
+  it 'multiple.xlsx' do
+    workbook = ExcelUtils.read resource_path('multiple.xlsx'), normalize_column_names: true
+
+    workbook.sheets.map(&:name).must_equal ['Sheet1', 'Sheet2', 'Sheet3']
+
+    expected_rows_sheet_1 = [
+      {id: 1, value: 'Text 1'},
+      {id: 2, value: 'Text 2'}
+    ]
+
+    workbook['Sheet1'].column_names.must_equal [:id, :value]
+    workbook['Sheet1'].to_a.must_equal expected_rows_sheet_1
+
+    workbook['Sheet2'].column_names.must_equal [:id, :value]
+    workbook['Sheet2'].to_a.must_equal []
+
+    workbook['Sheet3'].column_names.must_equal []
+    workbook['Sheet3'].to_a.must_equal []
+
+    workbook.to_h.must_equal 'Sheet1' => expected_rows_sheet_1,
+                             'Sheet2' => [],
+                             'Sheet3' => []
   end
 
 end
