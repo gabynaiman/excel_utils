@@ -20,9 +20,9 @@ module ExcelUtils
   def self.read(filename, **options)
     extension = options.fetch(:extension, File.extname(filename)[1..-1])
     if extension == 'csv'
-      Workbooks::CSV.new filename, **options
+      Workbooks::CSV.new(filename, **options)
     else
-      Workbooks::Excel.new filename, **options
+      Workbooks::Excel.new(filename, **options)
     end
   end
 

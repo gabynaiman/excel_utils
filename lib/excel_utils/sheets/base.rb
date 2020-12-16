@@ -4,23 +4,23 @@ module ExcelUtils
 
       include Enumerable
 
-      attr_reader :name
+      attr_reader :name, :normalize_column_names
 
-      def initialize(name, normalize_column_names)
+      def initialize(name:, normalize_column_names: false)
         @name = name
         @normalize_column_names = normalize_column_names
       end
 
-      def each(&block)
-        each_row do |row|
-          block.call column_names.zip(row).to_h
-        end
+      def column_names
+        @column_names ||= normalize_column_names ? normalize_columns(first_row) : first_row
       end
 
-      def column_names
-        @column_names ||= begin
-          columns = get_column_names
-          @normalize_column_names ? normalize_columns(columns) : columns
+      def each
+        if column_names.any?
+          each_row do |row|
+            break if empty_row? row
+            yield Hash[column_names.zip(row)]
+          end
         end
       end
 
@@ -32,7 +32,10 @@ module ExcelUtils
         end
       end
 
-    end
+      def empty_row?(row)
+        row.all? { |cell| cell.to_s.strip.empty? }
+      end
 
+    end
   end
 end

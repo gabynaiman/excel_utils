@@ -5,20 +5,16 @@ module ExcelUtils
       attr_reader :filename, :normalize_column_names
 
       def initialize(filename, normalize_column_names: false, extension: nil)
-        @spreadsheet = Roo::Spreadsheet.open filename, extension: extension
+        @filename = filename
         @normalize_column_names = normalize_column_names
+        @spreadsheet = Roo::Spreadsheet.open filename, extension: extension
       end
 
       def sheets
-        @sheets ||= begin
-          streaming = spreadsheet.respond_to? :each_row_streaming
-          spreadsheet.sheets.map do |name|
-            if streaming
-              Sheets::ExcelStream.new name, @spreadsheet, normalize_column_names
-            else
-              Sheets::Excel.new name, @spreadsheet, normalize_column_names
-            end
-          end
+        @sheets ||= spreadsheet.sheets.map do |name|
+          sheet_class.new name: name,
+                          normalize_column_names: normalize_column_names,
+                          spreadsheet: spreadsheet
         end
       end
 
@@ -36,7 +32,10 @@ module ExcelUtils
 
       attr_reader :spreadsheet
 
-    end
+      def sheet_class
+        @sheet_class ||= spreadsheet.respond_to?(:each_row_streaming) ? Sheets::ExcelStream : Sheets::Excel
+      end
 
+    end
   end
 end

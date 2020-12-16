@@ -2,30 +2,27 @@ module ExcelUtils
   module Sheets
     class CSV < Base
 
-      def initialize(filename, name, normalize_column_names)
-        super name, normalize_column_names
+      def initialize(filename:, **options)
+        super(**options)
         @filename = filename
       end
 
       private
 
+      attr_reader :filename
+
+      def first_row
+        NesquikCSV.open(filename) { |csv| csv.readline } || []
+      end
+
       def each_row
         first = true
-        NesquikCSV.foreach(@filename) do |row|
+        NesquikCSV.foreach(filename) do |row|
           yield row unless first
           first = false
         end
       end
 
-      def get_column_names
-        columns = []
-        NesquikCSV.foreach(@filename) do |header|
-          columns = header
-          break
-        end
-        columns
-      end
     end
-
   end
 end

@@ -2,37 +2,31 @@ module ExcelUtils
   module Sheets
     class Excel < Base
 
-      def initialize(name, spreadsheet, normalize_column_names)
-        super name, normalize_column_names
+      def initialize(spreadsheet:, **options)
+        super(**options)
         @spreadsheet = spreadsheet
       end
 
       private
 
-      attr_reader :spreadsheet, :normalize_column_names
+      attr_reader :spreadsheet
+
+      def first_row
+        with_sheet do |sheet|
+          sheet.first_row ? sheet.row(sheet.first_row) : []
+        end
+      end
 
       def each_row
-        if sheet.first_row
-          first = true
-          sheet.each do |row|
-            yield row unless first
-            first = false
+        with_sheet do |sheet|
+          (sheet.first_row + 1).upto(sheet.last_row) do |i|
+            yield sheet.row(i)
           end
-        else
-          []
         end
       end
 
-      def get_column_names
-        if sheet.first_row
-          sheet.row sheet.first_row
-        else
-          []
-        end
-      end
-
-      def sheet
-        spreadsheet.sheet name
+      def with_sheet
+        yield spreadsheet.sheet(name)
       end
 
     end

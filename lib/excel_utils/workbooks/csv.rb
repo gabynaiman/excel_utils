@@ -2,25 +2,35 @@ module ExcelUtils
   module Workbooks
     class CSV
 
-      DEFAULT_SHEET_NAME = 'default'.freeze
+      SHEET_NAME = 'default'.freeze
+
+      attr_reader :filename, :normalize_column_names
 
       def initialize(filename, normalize_column_names: false)
-        @iterator = Sheets::CSV.new filename, DEFAULT_SHEET_NAME, normalize_column_names
+        @filename = filename
+        @normalize_column_names = normalize_column_names
+
+        @sheet = Sheets::CSV.new name: SHEET_NAME,
+                                 normalize_column_names: normalize_column_names,
+                                 filename: filename
       end
 
       def sheets
-        [@iterator]
+        [sheet]
       end
 
       def [](sheet_name)
-        sheet_name == DEFAULT_SHEET_NAME ? @iterator : nil
+        sheet_name == SHEET_NAME ? sheet : nil
       end
 
       def to_h
-        {DEFAULT_SHEET_NAME => @iterator.to_a}
+        {SHEET_NAME => sheet.to_a}
       end
 
-    end
+      private
 
+      attr_reader :sheet
+
+    end
   end
 end
