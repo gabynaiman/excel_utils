@@ -19,9 +19,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'inflecto', '~> 0.0'
-  spec.add_runtime_dependency 'roo', '~> 2.7'
-  spec.add_runtime_dependency 'roo-xls', '~> 1.1'
+  spec.add_runtime_dependency 'roo', '~> 2.8'
+  spec.add_runtime_dependency 'roo-xls', '~> 1.2'
   spec.add_runtime_dependency 'write_xlsx', '~> 0.85'
+  spec.add_runtime_dependency 'nesquikcsv', '~> 0.1'
 
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'minitest', '~> 5.0', '< 5.11'
