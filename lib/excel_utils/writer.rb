@@ -9,7 +9,7 @@ module ExcelUtils
     }
 
     class << self
-    
+
       def write(filename, data)
         workbook = WriteXLSX.new filename, strings_to_urls: false
 
@@ -43,12 +43,12 @@ module ExcelUtils
               if row[column]
                 if row[column].is_a? String
                   sheet.write_string row_index, col_index, row[column]
-                
+
                 elsif row[column].respond_to? :to_time
                   time = row[column].to_time
                   type = date?(time) ? :date : :date_time
                   sheet.write_date_time row_index, col_index, time.to_time.strftime(TIME_FORMAT), formats[type]
-                
+
                 else
                   sheet.write row_index, col_index, row[column]
                 end
