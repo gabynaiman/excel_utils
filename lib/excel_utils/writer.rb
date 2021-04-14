@@ -1,12 +1,14 @@
 module ExcelUtils
   class Writer
 
-    TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+    DEFAULT_SHEET_NAME = 'Sheet1'.freeze
+
+    TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'.freeze
 
     EXCEL_FORMATS = {
       date: 'yyyy-mm-dd',
       date_time: 'yyyy-mm-dd hh:mm:ss'
-    }
+    }.freeze
 
     class << self
 
@@ -14,6 +16,8 @@ module ExcelUtils
         workbook = WriteXLSX.new filename, strings_to_urls: false
 
         formats = add_formats workbook
+
+        data = {DEFAULT_SHEET_NAME => data} if data.is_a? Array
 
         data.each do |sheet_name, sheet_data|
           add_sheet workbook, sheet_name, sheet_data, formats
@@ -41,7 +45,7 @@ module ExcelUtils
             row_index = r + 1
             header.each_with_index do |column, col_index|
               if row[column]
-                if row[column].is_a? String
+                if row[column].is_a?(String) || row[column].is_a?(Array)
                   sheet.write_string row_index, col_index, row[column]
 
                 elsif row[column].respond_to? :to_time
