@@ -1,7 +1,7 @@
 # ExcelUtils
 
 [![Gem Version](https://badge.fury.io/rb/excel_utils.svg)](https://rubygems.org/gems/excel_utils)
-[![Build Status](https://travis-ci.org/gabynaiman/excel_utils.svg?branch=master)](https://travis-ci.org/gabynaiman/excel_utils)
+[![CI](https://github.com/gabynaiman/excel_utils/actions/workflows/ci.yml/badge.svg)](https://github.com/gabynaiman/excel_utils/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/gabynaiman/excel_utils/badge.svg?branch=master)](https://coveralls.io/github/gabynaiman/excel_utils?branch=master)
 [![Code Climate](https://codeclimate.com/github/gabynaiman/excel_utils.svg)](https://codeclimate.com/github/gabynaiman/excel_utils)
 
