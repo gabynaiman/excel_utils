@@ -74,6 +74,15 @@ describe ExcelUtils do
       assert_wrote rows, rows.map { |r| {'column_a' => r['column_a'].to_s} }
     end
 
+    it 'Booleans' do
+      rows = [
+        {'column_a' => true, 'column_b' => 'text 1'},
+        {'column_a' => false, 'column_b' => 'text 2'}
+      ]
+
+      assert_wrote rows, [{'column_a' => 'true', 'column_b' => 'text 1'}, {'column_a' => 'false', 'column_b' => 'text 2'}]
+    end
+
   end
 
   it 'Multiple sheets' do
