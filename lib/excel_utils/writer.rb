@@ -44,9 +44,12 @@ module ExcelUtils
           sheet_data.each_with_index do |row, r|
             row_index = r + 1
             header.each_with_index do |column, col_index|
-              if row[column]
+              unless row[column].nil?
                 if row[column].is_a?(String) || row[column].is_a?(Array)
                   sheet.write_string row_index, col_index, row[column]
+
+                elsif [true, false].include?(row[column])
+                  sheet.write_string row_index, col_index, row[column].to_s
 
                 elsif row[column].respond_to? :to_time
                   time = row[column].to_time
